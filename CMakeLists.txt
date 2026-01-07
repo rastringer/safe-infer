@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.20)
+project(safe_infer LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_library(safe_infer 
+	src/tensor_shape.cpp
+	src/tensor.cpp
+)
+
+target_include_directories(safe_infer PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Warnings 
+if (MSVC)
+	target_compile_options(safe_infer PRIVATE /W4)
+else()
+	target_compile_options(safe_infer PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+enable_testing()
+
+add_executable(test_tensor_shape tests/test_tensor_shape.cpp)
+target_link_libraries(test_tensor_shape PRIVATE safe_infer)
+add_test(NAME test_tensor_shape COMMAND test_tensor_shape)
+
+
+
+
