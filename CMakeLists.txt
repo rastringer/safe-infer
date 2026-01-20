@@ -9,6 +9,7 @@ add_library(safe_infer
 	src/tensor_shape.cpp
 	src/tensor.cpp
 	src/planner.cpp
+	src/executor.cpp
 )
 
 target_include_directories(safe_infer PUBLIC
@@ -36,6 +37,8 @@ add_executable(test_planner tests/test_planner.cpp)
 target_link_libraries(test_planner PRIVATE safe_infer)
 add_test(NAME test_planner COMMAND test_planner)
 
+add_executable(example_simple_relu examples/simple_relu.cpp)
+target_link_libraries(example_simple_relu PRIVATE safe_infer)
 
 
 

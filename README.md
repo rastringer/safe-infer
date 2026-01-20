@@ -59,6 +59,13 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+## Example
+
+```bash
+./example_simple_relu
+# Output: y: 0 2 0 4
+```
+
 ---
 
 ## Current Status
