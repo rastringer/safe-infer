@@ -8,7 +8,7 @@
 * Learn about the basics of inference engines  
 * Understand the scope of the course and an introduction to the codebase
 
-## Why a course on inference engines?
+### Why a course on inference engines?
 
 Most AI safety and security materials focus on research topics such as model architectures, training techniques, accuracy metrics and various approaches to interpreting and ensuring behaviour.
 
@@ -22,7 +22,7 @@ When considering AI safety and security, however, we need to appraise the entire
 
 In this course, we will learn about how such issues arise and can be mitigated by building a small inference engine in C++. If you enjoy C++, hands on code examples and are curious about how the various AI tools and frameworks carry out their magic under the hood, this course is for you.
 
-## The engine
+### The engine
 
 We will build a small, CPU-only inference engine with the following properties:
 
@@ -32,7 +32,7 @@ We will build a small, CPU-only inference engine with the following properties:
 * Uses a simple, custom model format
 
 
-## Structure
+### Structure
 
 * The course follows artifacts from GitHub pull requests which show our project progressing. Please follow along on your own machine by implementing the code as we go (recommended), or read along and consider what vulnerabilities or improvements may be relevant in the next lesson.
 
@@ -42,9 +42,12 @@ The course mimics the evolution of many systems:
 * Reason about why
 * Improve the design
 
-## Phases
+### Phases
 
 In Phase 1, we will focus on making basic execution of models work in modern, clean C++. The engine will function however will be unsafe.
 
 In Phase 2, We will trigger crashes or corruptions and add validation, invariants and other mitigations to improve system safety and security.
 
+### Next Lesson
+
+We will build the foundation of the engine by defining tensor shapes.

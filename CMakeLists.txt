@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(safe_infer 
 	src/tensor_shape.cpp
 	src/tensor.cpp
+	src/planner.cpp
 )
 
 target_include_directories(safe_infer PUBLIC
@@ -26,6 +27,14 @@ enable_testing()
 add_executable(test_tensor_shape tests/test_tensor_shape.cpp)
 target_link_libraries(test_tensor_shape PRIVATE safe_infer)
 add_test(NAME test_tensor_shape COMMAND test_tensor_shape)
+
+add_executable(test_tensor tests/test_tensor.cpp)
+target_link_libraries(test_tensor PRIVATE safe_infer)
+add_test(NAME test_tensor COMMAND test_tensor)
+
+add_executable(test_planner tests/test_planner.cpp)
+target_link_libraries(test_planner PRIVATE safe_infer)
+add_test(NAME test_planner COMMAND test_planner)
 
 
 
