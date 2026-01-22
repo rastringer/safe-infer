@@ -141,6 +141,7 @@ The planner detects cycles by checking whether all nodes were scheduled. If not,
 
 ### Diagram
 
+```
 Legend:
   [OpN: OpCode] = node id N and operation
   (tK)          = TensorId K
@@ -167,7 +168,7 @@ DATAFLOW (what the model *means*)
        [3:Relu]
           |
          (t5)    graph_output
-
+```
 
 ### Tests
 

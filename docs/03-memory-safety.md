@@ -18,6 +18,8 @@ Results of tensor mismanagement may include buffer overruns, use-after-free bugs
 
 ### How Tensor Shapes can Become Memory Accesses
 
+```
+
                  (USER / MODEL / FILE INPUT)
                          dims = [d0, d1, ...]
                                 |
@@ -56,7 +58,7 @@ Results of tensor mismanagement may include buffer overruns, use-after-free bugs
                                  |
                                  v
         SAFE: linear_index < n  ⇒ access stays in bounds
-
+```
 
 ---
 
@@ -70,6 +72,7 @@ We enforce this by using RAII for lifetime management, deleting copy operations
 and allowing ownership to be transferred via move semantics
 
 This prevents accidental, implicit duplication of large buffers.
+```
 
         ┌──────────────┐        move        ┌──────────────┐
         │   Tensor t1  │  ───────────────▶  │   Tensor t2  │
@@ -81,7 +84,7 @@ This prevents accidental, implicit duplication of large buffers.
         valid but inert                    ~Tensor() called
         (do not use)                       vector frees memory
 
-
+```
 ---
 
 ### The `Tensor` Interface
