@@ -139,6 +139,36 @@ The planner detects cycles by checking whether all nodes were scheduled. If not,
 
 ---
 
+### Diagram
+
+Legend:
+  [OpN: OpCode] = node id N and operation
+  (tK)          = TensorId K
+  t0,t1 are graph_inputs (no producer required)
+  arrows show "produces tensor consumed by"
+
+DATAFLOW (what the model *means*)
+
+   graph_inputs
+   (t0)      (t1)
+     |         |
+     v         v
+ [0:Input]  [1:Input]
+    |          |
+   (t2)       (t3)
+      \       /
+       \     /
+        v   v
+       [2:Add]
+          |
+         (t4)
+          |
+          v
+       [3:Relu]
+          |
+         (t5)    graph_output
+
+
 ### Tests
 
 The planner is validated with tests that cover:

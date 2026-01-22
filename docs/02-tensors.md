@@ -12,6 +12,26 @@ Understand how unchecked tensor sizes can lead to security bugs and undefined be
 
 A tensor shape determines how much memory is allocated, how to compute indexing, and which memory locations are read and written to. A malformed shape can cause buffer overflow, memory corruption or crashes. 
 
+Tensor
+┌───────────────────────────────────────────────┐
+│                                               │
+│  TensorShape                                  │
+│  ┌───────────────┐                            │
+│  │ dims = [2, 3] │  rank = 2                  │
+│  │               │  num_elements = 6          │
+│  └───────────────┘                            │
+│                                               │
+│  data (contiguous memory)                     │
+│  ┌───────┬───────┬───────┬───────┬───────┬───────┐
+│  │ 0.12  │ -1.3  │  2.0  │  0.0  │  4.1  │ -0.7  │
+│  └───────┴───────┴───────┴───────┴───────┴───────┘
+│                                               │
+│  flat storage, shape-aware interpretation     │
+│                                               │
+└───────────────────────────────────────────────┘
+
+
+
 ### Enforcing Invariants
 
 An invariant is a property that always must be true for an object to be valid. A key design principle for our small engine is that we enforce these invariants early:

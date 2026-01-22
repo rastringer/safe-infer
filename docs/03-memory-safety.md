@@ -14,9 +14,49 @@ This lesson corresponds to PR [#2](https://github.com/rastringer/safe-infer/comm
 
 When talking about ML systems, a tensor represents a contiguous block of memory which indexed by arithmetic derived from shapes. Tensors are typically read and written by multiple operations.
 
-Results of tensor mismanagement may include buffer overruns, use-after-free bugs, and silent data corruption.
+Results of tensor mismanagement may include buffer overruns, use-after-free bugs, and silent data corruption. Once tensor memory is corrupted, no amount of correct math can recover correctness, so tensor ownership a first-class safety concern.
 
-Once tensor memory is corrupted, no amount of correct math can recover correctness, so tensor ownership a first-class safety concern.
+### How Tensor Shapes can Become Memory Accesses
+
+                 (USER / MODEL / FILE INPUT)
+                         dims = [d0, d1, ...]
+                                |
+                                v
+                 ┌────────────────────────────────┐
+                 │  TensorShape constructor        │
+                 │  Invariants enforced once:      │
+                 │   • dims not empty              │
+                 │   • each d > 0                  │
+                 │   • num_elements fits in size_t │
+                 └───────────────┬────────────────┘
+                                 |
+                                 v
+                    overflow-safe num_elements()
+                 product = 1
+                 for d in dims:
+                    if product > MAX / d:
+                        throw overflow_error
+                    product *= d
+                                 |
+                                 v
+                      n = num_elements (trusted)
+                                 |
+                                 v
+         ┌─────────────────────────────────────────────────┐
+         │                   MEMORY                         │
+         │ allocate n * sizeof(T) bytes  →  indices [0..n)  │
+         └─────────────────────────────────────────────────┘
+                                 |
+                                 v
+                 indexing uses the same shape math
+             linear_index(i, …) computed from dims
+                                 |
+                                 v
+        address = base + linear_index * sizeof(T)
+                                 |
+                                 v
+        SAFE: linear_index < n  ⇒ access stays in bounds
+
 
 ---
 
@@ -30,6 +70,17 @@ We enforce this by using RAII for lifetime management, deleting copy operations
 and allowing ownership to be transferred via move semantics
 
 This prevents accidental, implicit duplication of large buffers.
+
+        ┌──────────────┐        move        ┌──────────────┐
+        │   Tensor t1  │  ───────────────▶  │   Tensor t2  │
+        │  owns buffer │                    │  owns buffer │
+        └──────┬───────┘                    └──────┬───────┘
+               │                                   │
+               │ moved-from                        │ scope ends
+               v                                   v
+        valid but inert                    ~Tensor() called
+        (do not use)                       vector frees memory
+
 
 ---
 

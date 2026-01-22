@@ -45,8 +45,7 @@ std::vector<NodeId> plan_execution(const Graph& g) {
 
         case OpCode::Const:
         case OpCode::MatMul:
-            // For now: either enforce a shape you support, or reject.
-            // I recommend rejecting until PR #9 capstone.
+            // Place holder for potential capstone.
             throw std::domain_error("Graph invalid: op not supported by planner validation yet");
 
         default:
