@@ -24,7 +24,7 @@ In the previous lessons, we focused on *individual building blocks*:
 * `TensorShape` ensured safe metadata and sizes
 * `Tensor` ensured correct memory ownership
 
-Once we have multiple tensors and multiple operations, we need to consider the order in which operations should run. The answer is determined by **data dependencies**.
+Once we have multiple tensors and multiple operations, we need to consider the order in which operations should run. The answer is determined by data dependencies.
 
 ---
 
@@ -62,10 +62,7 @@ struct Graph {
 };
 ```
 
-This representation is intentionally minimal:
-
-* it contains no tensor data
-* it encodes only *structure* and *dependencies*
+This representation is intentionally minimal, contains no tensor data and encodes only *structure* and *dependencies*.
 
 ---
 
@@ -82,7 +79,7 @@ This means that every tensor referenced by the graph must exist, and invalid ten
 The planner enforces several key invariants:
 
 * all tensor IDs are in range
-* each tensor has **at most one producer**
+* each tensor has at most one producer
 * nodes cannot depend on their own outputs
 
 Rejecting invalid graphs early prevents:
@@ -97,7 +94,7 @@ Execution code assumes the graph is valid.
 
 ### Producer–Consumer Relationships
 
-To determine dependencies, the planner builds a **producer map**:
+To determine dependencies, the planner builds a producer map:
 
 > *Which node produces each tensor?*
 
@@ -121,9 +118,7 @@ These structures make execution order explicit.
 
 ### Topological Sorting
 
-To compute a valid execution order, we perform a [**topological sort**](https://en.wikipedia.org/wiki/Topological_sorting).
-
-This means we undertake a graph traversal, visiting each node only after dependant nodes are visited:
+To compute a valid execution order, we perform a [topological sort](https://en.wikipedia.org/wiki/Topological_sorting). This means we undertake a graph traversal, visiting each node only after dependant nodes are visited:
 
 1. Start with all nodes that have no dependencies
 2. Repeatedly schedule nodes whose dependencies are satisfied
@@ -157,11 +152,7 @@ The planner is validated with tests that cover:
 
 ### Current Status
 
-At this stage, the system can:
-
-* represent models as explicit programs
-* validate structural correctness
-* compute a deterministic execution order
+At this stage, the system can represent models as explicit programs, validate structural correctness, and compute a deterministic execution order.
 
 ---
 

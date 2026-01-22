@@ -12,17 +12,9 @@ This lesson corresponds to PR [#2](https://github.com/rastringer/safe-infer/comm
 
 ### Tensors Are a Safety Boundary
 
-When talking about ML systems, a tensor is:
+When talking about ML systems, a tensor represents a contiguous block of memory which indexed by arithmetic derived from shapes. Tensors are typically read and written by multiple operations.
 
-* a contiguous block of memory
-* indexed by arithmetic derived from shapes
-* read and written by multiple operations
-
-Results of tensor mismanagement may include:
-
-* buffer overruns
-* use-after-free bugs
-* silent data corruption
+Results of tensor mismanagement may include buffer overruns, use-after-free bugs, and silent data corruption.
 
 Once tensor memory is corrupted, no amount of correct math can recover correctness, so tensor ownership a first-class safety concern.
 
@@ -34,11 +26,8 @@ The central design choice for `Tensor` is simple:
 
 > **There can be only one owner of a tensor's memory.**
 
-We enforce this by:
-
-* using RAII for lifetime management
-* deleting copy operations
-* allowing ownership to be transferred via move semantics
+We enforce this by using RAII for lifetime management, deleting copy operations
+and allowing ownership to be transferred via move semantics
 
 This prevents accidental, implicit duplication of large buffers.
 
@@ -133,7 +122,7 @@ Tensor t2 = std::move(t1);
 
 `t2` owns the data.
 
-`t1` is left in a **valid but unspecified state**:
+`t1` is left in a valid but unspecified state:
 
 * it can be destroyed safely
 * it should not be used for computation
@@ -142,11 +131,7 @@ Tensor t2 = std::move(t1);
 
 ### Accessors and Contracts
 
-The accessors are designed to communicate:
-
-* who owns the data
-* what can be mutated
-* what operations cannot throw
+The accessors are designed to communicate who owns the data, what can be mutated, and what operations cannot throw.
 
 ```cpp
 const TensorShape& shape() const noexcept;
@@ -167,26 +152,13 @@ Here is the indexing operator, which is intentionally unchecked.
 float& operator[](std::size_t i) noexcept;
 ```
 
-Bounds checking should ideally be carried out at higher abstraction layers, and unchecked access is predictable and fast.
-
-* bounds checking belongs at higher abstraction layers
-* unchecked access is predictable 
-
-Safety here comes from:
-
-* validated shapes
-* correct allocation
-* controlled usage patterns
+Bounds checking should ideally be carried out at higher abstraction layers, and unchecked access is predictable and fast. We improve engine safety through shape validation, correct allocation and controlled usage patterns.
 
 ---
 
 ### Tests as Proof of Design
 
-The accompanying tests verify:
-
-* correct allocation size
-* read/write behavior
-* correct behavior after move
+The accompanying tests verify correct allocation size, read/write behavior and correct behavior after `move` operations.
 
 ---
 

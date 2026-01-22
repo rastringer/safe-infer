@@ -84,6 +84,7 @@ Since the execution completes successfully, and the output looks plausible (all 
 
 Mis-computation can be worse than a system crash since symptoms such as incorrect predictions, bias and false confidence in model behaviour can be more harmful, and difficult to detect.
 
+After Lesson 7 and PR [#6](https://github.com/rastringer/safe-infer/commit/a467f43634655b81f66152b0f1261ed72fd09d2e), this becomes a fail-fast error.
 ---
 
 There are other failure modes our system needs to address:

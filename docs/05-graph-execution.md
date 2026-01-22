@@ -6,7 +6,9 @@
 
 ### Goals
 
-* How a validated execution plan is turned into **actual computation**
+In this lesson, we cover:
+
+* How a validated execution plan is turned into computation
 * Why planning and execution are deliberately separated
 * Assumptions a minimal executor can safely make
 * How even a tiny executor exposes important safety boundaries
@@ -23,7 +25,7 @@ Having built a computation graph and a planner that produces a valid execution o
 * *how* they depend on one another
 * *in what order* they must run
 
-In this lesson, we specify how the system should perform computations.
+We now need to specify how the system should perform computations.
 
 ---
 
@@ -31,8 +33,8 @@ In this lesson, we specify how the system should perform computations.
 
 A deliberate design choice in this project is to separate:
 
-* **planning** (graph validation and scheduling)
-* **execution** (running operations and producing outputs)
+* planning (graph validation and scheduling)
+* execution (running operations and producing outputs)
 
 This is because planning is about correctness and safety, while execution is about state mutation and computation. Keeping these concerns separate makes both stages easier to reason about and test.
 
@@ -48,13 +50,7 @@ std::vector<Tensor> tensors;
 
 Each entry corresponds to a `TensorId` in the graph.
 
-At execution time:
-
-* tensors are already allocated
-* input tensors are pre-filled by the caller
-* output tensors are written by operations
-
-The executor does not allocate or resize tensors.
+At execution time, the tensors are already allocated. Input tensors are pre-filled by the caller and output tensors are written by operations. The executor does not allocate or resize tensors.
 
 ---
 
@@ -68,13 +64,7 @@ void execute(const Graph& g,
              std::vector<Tensor>& tensors);
 ```
 
-This function:
-
-* assumes the graph has already been validated
-* executes nodes in the given order
-* mutates the tensor store in place
-
-Any violation of its assumptions results in an explicit error.
+This function assumes the graph has already been validated, executes nodes in the given order and mutates the tensor store in place. Any violation of its assumptions results in an explicit error.
 
 ---
 
@@ -122,10 +112,6 @@ And Add:
 out[i] = a[i] + b[i];
 ```
 
-No broadcasting, no shape inference, no optimizations.
-
-The goal is clarity, not performance.
-
 ---
 
 ### A First End-to-End Example
@@ -148,11 +134,7 @@ The output is:
 [0, 2, 0, 4]
 ```
 
-This confirms that:
-
-* the graph was planned correctly
-* execution followed the correct order
-* tensor data flowed as intended
+This shows that the graph is planned correctly and tensor data flows as intended.
 
 ---
 
@@ -189,15 +171,7 @@ Understanding where assumptions live is the first step to hardening them.
 
 ### Current Status
 
-At this stage, the system can:
-
-* represent a model as a graph
-* validate its structure
-* plan execution order
-* execute operations
-* produce real numerical outputs
-
-This is a complete (if minimal) inference pipeline.
+At this stage, the our minimal pipeline represents a model as a graph and validates its structure. The engine then plans execution order, conducts operation and provides outputs.
 
 ---
 

@@ -50,7 +50,6 @@ The missing-input example showed that though inference ran successfully and the 
 To prevent this, the runtime introduces an explicit concept of **input binding**. This stipulates that a caller must bind each `graph_input`, and the execution checks bindings before running. This should turn silent failures into obvious errors which are easier to debug.
 
 
-
 Hardening rule:
 > If a required input is not bound, execution must fail fast.
 
@@ -77,7 +76,7 @@ Previously, our graph planned and the executor made rejections at runtime. Now, 
 
 In the last lesson, the graph executed anyway, and NaNs were masked into zeroes. Now, missing bindings are detected before execution begins, and the system fails fast with a clear message.
 
-After PR #6, this becomes a fail-fast error.
+After PR [#6](https://github.com/rastringer/safe-infer/commit/a467f43634655b81f66152b0f1261ed72fd09d2e), this becomes a fail-fast error.
 
 ---
 
@@ -95,7 +94,7 @@ We added clear contracts and enforced them at suitable stages in the engine's op
 As with many security considerations in software, the tradeoff is that more checks make an application safer and easier to debug while increasing the computational overhead.
 
 In the next lesson, we’ll discuss how production systems balance
-**performance vs safety**, and how we can aim for both optimized checking and speed.
+performance vs safety, and how we can aim for both optimized checking and speed.
 
 ---
 

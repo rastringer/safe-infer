@@ -65,14 +65,11 @@ for (auto d : dims_) {
 }
 ```
 
-This code is problematic because if the multiplication overflows `size_t`, the behaviour is undefined, and the result wraps around. The wrapped value may then be used to:
-* allocate too little memory
-* index out of bounds
-* corrupt unrelated memory
+This code is problematic because if the multiplication overflows `size_t`, the behaviour is undefined, and the result wraps around. The wrapped value could then be used to allocate too little memory, index out of bounds, or even to corrupt unrelated memory.
 
 ### Overflow-Safe Multiplication
 
-Here, we instead check explicitly for overflow:
+Instead, we check explicitly for overflow:
 
 ```
 std::size_t TensorShape::num_elements() const {
