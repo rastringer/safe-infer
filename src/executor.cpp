@@ -3,6 +3,8 @@
 #include <algorithm>    
 #include <stdexcept>   
 #include <string>       
+#include <cstddef>
+#include <sstream>
 
 namespace safe_infer {
 
@@ -58,9 +60,33 @@ void exec_add(const Node& node, std::vector<Tensor>& tensors) {
 
 } // namespace
 
-void execute(const Graph& g, const std::vector<NodeId>& plan, std::vector<Tensor>& tensors) {
+InputBindings::InputBindings(std::size_t num_tensors) : bound_(num_tensors, false) {}
+
+void InputBindings::bind(TensorId id) {
+    require(id < bound_.size(), "InputBindings::bind: TensorId out of range");
+    bound_[id] = true;
+}
+
+bool InputBindings::is_bound(TensorId id) const noexcept {
+    return id < bound_.size() && bound_[id];
+}
+
+
+void execute(const Graph& g, 
+            const std::vector<NodeId>& plan, 
+            std::vector<Tensor>& tensors,
+            const InputBindings& bindings) {
     require(tensors.size() == g.tensor_shapes.size(),
             "execute: tensors.size() must equal g.tensor_shapes.size()");
+
+    // Ensure every required graph input is bound.
+    for (TensorId t : g.graph_inputs) {
+        if (!bindings.is_bound(t)) {
+            std::ostringstream oss;
+            oss << "execute: missing input binding for TensorId " << t;
+            throw std::domain_error(oss.str());
+        }
+    }        
 
     // (Optional sanity) ensure plan indexes are valid
     for (NodeId nid : plan) {

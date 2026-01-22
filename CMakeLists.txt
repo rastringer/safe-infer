@@ -47,4 +47,6 @@ target_link_libraries(example_shape_mismatch PRIVATE safe_infer)
 add_executable(example_missing_input examples/attacks/missing_input.cpp)
 target_link_libraries(example_missing_input PRIVATE safe_infer)
 
-
+add_executable(test_executor tests/test_executor.cpp)
+target_link_libraries(test_executor PRIVATE safe_infer)
+add_test(NAME test_executor COMMAND test_executor)

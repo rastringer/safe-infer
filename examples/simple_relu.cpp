@@ -29,7 +29,10 @@ int main() {
     tensors[0][2] = -3.0f;
     tensors[0][3] =  4.0f;
 
-    execute(g, plan, tensors);
+    InputBindings bindings(g.tensor_shapes.size());
+    bindings.bind(0); // x is provided by caller
+
+    execute(g, plan, tensors, bindings);
 
     // Print output y
     std::cout << "y: ";

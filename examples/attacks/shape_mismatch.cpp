@@ -36,9 +36,12 @@ int main() {
             tensors[1][i] = 100.0f + static_cast<float>(i);
         }
 
-        // This should throw (Add requires same element count).
-        execute(g, plan, tensors);
+        InputBindings bindings(g.tensor_shapes.size());
+        bindings.bind(0);
+        bindings.bind(1);
 
+        execute(g, plan, tensors, bindings);
+        
         std::cout << "Unexpected success (this should have thrown)\n";
         return 1;
     } catch (const std::exception& e) {
