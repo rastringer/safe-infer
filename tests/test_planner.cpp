@@ -140,6 +140,27 @@ int main() {
         );
     }
 
+    // Test: Consumes tensor with no source should throw
+    {
+        check_throws<std::domain_error>(
+            [] {
+
+                Graph g;
+                g.tensor_shapes = { TensorShape({1}), TensorShape({1}) };
+
+                // Node consumes tensor 0, produces tensor 1
+                // But tensor 0 is neither produced nor listed as a graph input.
+                g.nodes.push_back(Node{OpCode::Relu, {0}, {1}});
+
+                g.graph_inputs = {};     // <- missing
+                g.graph_outputs = {1};
+
+                (void)plan_execution(g);
+            },
+            "no source: should throw std::domain_error"
+        );
+    }
+
     if (g_failures == 0) {
         std::cout << "PASS: test_planner\n";
         return 0;

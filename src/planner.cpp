@@ -1,6 +1,5 @@
 #include "safe_infer/planner.h"
 
-#include <unordered_map>
 #include <queue>
 #include <stdexcept>
 
@@ -9,26 +8,58 @@ namespace safe_infer {
 std::vector<NodeId> plan_execution(const Graph& g) {
     // Validation
     const std::size_t num_tensors = g.tensor_shapes.size();
+    const std::size_t num_nodes = g.nodes.size();
     auto check_tensor_id = [&](TensorId t) {
         if (t >= num_tensors) {
-            throw std::domain_error("Graph refernces invalid TensorId");
+            throw std::domain_error("Graph references invalid TensorId");
         }
     };
 
-    // Run check_tensor_id over node and graph inputs and outputs
+    std::vector<bool> is_graph_input(num_tensors, false);
     for (TensorId t : g.graph_inputs) {
         check_tensor_id(t);
+        is_graph_input[t] = true;
     }
-    for (TensorId t : g.graph_outputs) {
-        check_tensor_id(t);
-    } 
+    for (TensorId t : g.graph_outputs) {check_tensor_id(t);}
+
+    auto validate_arity = [&](const Node& node) {
+    switch (node.op) {
+        case OpCode::Input:
+            // If you are using Input nodes, enforce 0 -> 1
+            if (node.inputs.size() != 0 || node.outputs.size() != 1) {
+                throw std::domain_error("Graph invalid: Input expects 0 inputs and 1 output");
+            }
+            break;
+
+        case OpCode::Relu:
+            if (node.inputs.size() != 1 || node.outputs.size() != 1) {
+                throw std::domain_error("Graph invalid: Relu expects 1 input and 1 output");
+            }
+            break;
+
+        case OpCode::Add:
+            if (node.inputs.size() != 2 || node.outputs.size() != 1) {
+                throw std::domain_error("Graph invalid: Add expects 2 inputs and 1 output");
+            }
+            break;
+
+        case OpCode::Const:
+        case OpCode::MatMul:
+            // For now: either enforce a shape you support, or reject.
+            // I recommend rejecting until PR #9 capstone.
+            throw std::domain_error("Graph invalid: op not supported by planner validation yet");
+
+        default:
+            throw std::domain_error("Graph invalid: unknown OpCode");
+    }
+};
+
     for (const Node& node : g.nodes) {
-        for (TensorId t : node.inputs) {
-            check_tensor_id(t);
-        }
-        for (TensorId t : node.outputs) {
-            check_tensor_id(t);
-        }
+        validate_arity(node);
+    }
+    for (const Node& node : g.nodes) {
+        for (TensorId t : node.inputs) { check_tensor_id(t);}
+        for (TensorId t : node.outputs) {check_tensor_id(t);}
     }
 
     // Check each tensor has a single producer
@@ -48,7 +79,19 @@ std::vector<NodeId> plan_execution(const Graph& g) {
         }
     }
 
-    const std::size_t num_nodes = g.nodes.size();
+    for (NodeId nid = 0; nid < num_nodes; ++nid) {
+    const Node& node = g.nodes[nid];
+
+    for (TensorId in : node.inputs) {
+        // Valid sources are:
+        // - produced by some node, or
+        // - declared as a graph input
+        if (!has_producer[in] && !is_graph_input[in]) {
+            throw std::domain_error("Graph invalid: node consumes tensor with no source");
+        }
+    }
+}
+
     std::vector<std::vector<NodeId>> adj(num_nodes);
     std::vector<std::size_t> indegree(num_nodes, 0);
 

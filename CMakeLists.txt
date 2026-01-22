@@ -40,5 +40,11 @@ add_test(NAME test_planner COMMAND test_planner)
 add_executable(example_simple_relu examples/simple_relu.cpp)
 target_link_libraries(example_simple_relu PRIVATE safe_infer)
 
+# Examples (built, not tested)
+add_executable(example_shape_mismatch examples/attacks/shape_mismatch.cpp)
+target_link_libraries(example_shape_mismatch PRIVATE safe_infer)
+
+add_executable(example_missing_input examples/attacks/missing_input.cpp)
+target_link_libraries(example_missing_input PRIVATE safe_infer)
 
 
