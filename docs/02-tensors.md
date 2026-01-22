@@ -11,7 +11,7 @@ Understand how unchecked tensor sizes can lead to security bugs and undefined be
 ### TensorShapes
 
 A tensor shape determines how much memory is allocated, how to compute indexing, and which memory locations are read and written to. A malformed shape can cause buffer overflow, memory corruption or crashes. 
-
+```
 Tensor
 ┌───────────────────────────────────────────────┐
 │                                               │
@@ -29,7 +29,7 @@ Tensor
 │  flat storage, shape-aware interpretation     │
 │                                               │
 └───────────────────────────────────────────────┘
-
+```
 
 
 ### Enforcing Invariants
