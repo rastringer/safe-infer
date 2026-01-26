@@ -54,7 +54,9 @@ X -> MatMul(W1) -> Relu -> MatMul(W2) ->
 
 Where `x` is a graph input tensor of shape [1,2], W1 and W2, the model's *weights*, are Const tensors.
 
-`Const` matters since weights are part of the model, rather than runtime inputs. We make them const to safely avoid any adjustment - accidental or otherwise - to their values.
+### `Const`
+
+`Const` matters since weights are part of the model, rather than runtime inputs. We make them const to ensure they are written once and then only read from that point. This mitigates either accidental or intentional misue - the weights cannot be treated as caller-provided inputs by the executor.
 
 `Const` turns the model parameters into explicity graph nodes and tensor slots.
 
@@ -63,6 +65,32 @@ Where `x` is a graph input tensor of shape [1,2], W1 and W2, the model's *weight
 Matrix multiplication is the core building block of dense neural net layers. We implement only rank-2 matrices and perform shape-checked multiplication. We leave out more sophisticated operations such as broadcasting, batching, transposes or optimizations.
 
 ## Exercise
+
+Here's a look at our entire system:
+
+                 (model as data: Graph)
+        ┌───────────────────────────────────┐
+        │ Graph                             │
+        │  - tensor_shapes (TensorId→Shape) │
+        │  - nodes (NodeId→Op+in/out)       │
+        │  - graph_inputs / graph_outputs   │
+        └───────────────────┬───────────────┘
+                            │
+                            v
+                    plan_execution(g)
+      (validate + topo sort → NodeId execution order)
+                            │
+                            v
+        ┌───────────────────────────────────┐
+        │ Runtime                           │
+        │  tensors[TensorId] : Tensor       │
+        │  bindings : InputBindings         │
+        └───────────────────┬───────────────┘
+                            │
+                            v
+              execute(g, plan, tensors, bindings)
+     (run kernels in plan order, read/write tensors)
+
 
 Try to implement the following:
 
@@ -95,6 +123,25 @@ Create a graph with:
 - MatMul -> Relu -> MatMul pipeline
 - proper graph_inputs / graph_outputs
 
+Here's what we are aiming for:
+
+TensorIds:
+  t0 = x    [1x2]      (bound at runtime)
+  t1 = W1   [2x2]      (Const)
+  t2 = z1   [1x2]
+  t3 = h    [1x2]
+  t4 = W2   [2x1]      (Const)
+  t5 = y    [1x1]
+
+Nodes (dataflow):
+      t0      t1
+      │       │
+      └──▶ MatMul ───▶ t2 ───▶ Relu ───▶ t3
+                         t3      t4
+                         │       │
+                         └──▶ MatMul ───▶ t5
+
+
 ### 4: Run!
 
 Run inference for:
@@ -108,5 +155,5 @@ x=(0,1)  =>  y=1
 x=(1,0)  =>  y=1
 x=(1,1)  =>  y=0
 
-Please see this PR for the solution.
+Please see [this PR](https://github.com/rastringer/safe-infer/commit/6c97b7ec21fd2a1e1e2bfe1b92a20f4d9f5f15ae) for the solution (ignore the `docs/` updates and focus on `op.h`, `executor.cpp` and `planner.cpp`).
 
