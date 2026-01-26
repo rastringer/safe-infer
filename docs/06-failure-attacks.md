@@ -2,7 +2,6 @@
 
 ## Failure Modes and Attacks
 
----
 
 ### Goals
 
@@ -15,17 +14,14 @@ In this lesson, we explore:
 
 This lesson builds directly on the previous lesson and PR [#4](https://github.com/rastringer/safe-infer/commit/2cf609ce13808670a6911bf56b52628b653acf91).
 
----
 
 ### A Dangerous Milestone
 
 At the end of the previous lesson our system validated a graph, planned the execution, ran inference and gave correct-looking outputs. While it's tempting to sit back and enjoy a system that appears to be functioning well, we need to explore how it can go wrong rather than assume its operations are safe.
----
 
 ### Correctness vs Safety
 
 A system can be correct for expected inputs, and unsafe for unexpected or adversarial inputs. Inference engines sit at a boundary between trusted runtime code and untrusted models, graphs, and inputs, so scrutiny anything crossing this boundary is essential.
----
 
 ### The Executor’s Assumptions
 
@@ -40,7 +36,6 @@ The current executor assumes:
 
 While some of these assumptions are checked, others aren't, and unchecked assumptions define the attack surface.
 
----
 
 ## Failure Mode 1: Shape Mismatch (Fail-Fast)
 
@@ -60,7 +55,6 @@ Expected failure: Add: input element counts must match
 
 This is a *good* failure, since execution stops immediately (before producing incorrect outputs), the error is explicit. However, the invalid graph was still allowed to reach execution.
 
----
 
 ### Failure Mode 2: Missing Input Binding (Silent Failure)
 
@@ -85,7 +79,6 @@ Since the execution completes successfully, and the output looks plausible (all 
 Mis-computation can be worse than a system crash since symptoms such as incorrect predictions, bias and false confidence in model behaviour can be more harmful, and difficult to detect.
 
 After Lesson 7 and PR [#6](https://github.com/rastringer/safe-infer/commit/a467f43634655b81f66152b0f1261ed72fd09d2e), this becomes a fail-fast error.
----
 
 There are other failure modes our system needs to address:
 
@@ -93,24 +86,20 @@ There are other failure modes our system needs to address:
 
 We are covered here since the executor explicitly rejects unsupported ops.
 
----
 
 ## Failure Mode 4: Contract Mismatches Between Stages
 
 Our system's planner validates the graph, and the executor trusts the planner. However, what if the graph is modified after the planning is completed? What if runtime tensors don't match graph metadata? We need explicit constraints to avoid undefined behaviour.
 
----
 
 ## Current Status
 
 We have discussed potential attacks and failures to identify assumptions, observe consequences and will think about remedies.
 
----
 
 ## Next Lesson
 
 We will start **hardening the runtime**.
 
----
 
 **Next lesson:** Lesson 7 — Hardening the Runtime: Contracts and Validation

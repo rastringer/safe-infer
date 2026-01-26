@@ -44,13 +44,17 @@ std::vector<NodeId> plan_execution(const Graph& g) {
             break;
 
         case OpCode::Const:
+            if (node.inputs.size() != 0 || node.outputs.size() != 1) {
+                throw std::domain_error("Graph invalid: Const expects 0 inputs and 1 output");
+            }
+            break;
+            
         case OpCode::MatMul:
-            // Place holder for potential capstone.
-            throw std::domain_error("Graph invalid: op not supported by planner validation yet");
-
-        default:
-            throw std::domain_error("Graph invalid: unknown OpCode");
-    }
+            if (node.inputs.size() != 2 || node.outputs.size() != 1) {
+                throw std::domain_error("Graph invalid: MatMul expects 2 inputs and 1 output");
+            }
+            break;
+        }
 };
 
     for (const Node& node : g.nodes) {

@@ -8,7 +8,6 @@ Understand why **memory ownership** is the central safety concern in an inferenc
 
 This lesson corresponds to PR [#2](https://github.com/rastringer/safe-infer/commit/d8a2019be437a848cb68365e9200d2f3ad6a931f): **Add move-only Tensor (RAII-owned storage)**.
 
----
 
 ### Tensors Are a Safety Boundary
 
@@ -60,16 +59,13 @@ Results of tensor mismanagement may include buffer overruns, use-after-free bugs
         SAFE: linear_index < n  ⇒ access stays in bounds
 ```
 
----
-
 ### Design Principle: One Clear Owner
 
 The central design choice for `Tensor` is simple:
 
 > **There can be only one owner of a tensor's memory.**
 
-We enforce this by using RAII for lifetime management, deleting copy operations
-and allowing ownership to be transferred via move semantics
+We enforce this by using RAII for lifetime management, deleting copy operations, and allowing ownership to be transferred via move semantics.
 
 This prevents accidental, implicit duplication of large buffers.
 ```
@@ -85,7 +81,6 @@ This prevents accidental, implicit duplication of large buffers.
         (do not use)                       vector frees memory
 
 ```
----
 
 ### The `Tensor` Interface
 
@@ -104,7 +99,6 @@ Notably absent are:
 
 This keeps ownership explicit and easy to reason about.
 
----
 
 ### Construction and Allocation
 
@@ -125,7 +119,6 @@ Key points:
 
 Successful construction means the resulting tensor is fully valid.
 
----
 
 ## RAII and Automatic Cleanup
 
@@ -142,7 +135,6 @@ This guarantees:
 
 RAII makes correct behavior the default.
 
----
 
 ### Why the Tensor Is Move-Only
 
@@ -164,7 +156,6 @@ Tensor& operator=(Tensor&&) noexcept = default;
 
 By moving rather than copying a tensor, we transfer ownership of the buffer.
 
----
 
 ### Moved-From State
 
@@ -181,7 +172,6 @@ Tensor t2 = std::move(t1);
 * it can be destroyed safely
 * it should not be used for computation
 
----
 
 ### Accessors and Contracts
 
@@ -196,7 +186,6 @@ const float* data() const noexcept;
 
 Encoding these guarantees in the type system reduces misuse.
 
----
 
 ### Element Access
 
@@ -208,13 +197,11 @@ float& operator[](std::size_t i) noexcept;
 
 Bounds checking should ideally be carried out at higher abstraction layers, and unchecked access is predictable and fast. We improve engine safety through shape validation, correct allocation and controlled usage patterns.
 
----
 
 ### Tests as Proof of Design
 
 The accompanying tests verify correct allocation size, read/write behavior and correct behavior after `move` operations.
 
----
 
 ### Current Status
 
@@ -227,7 +214,6 @@ At this point, we have:
 
 This is the core memory safety foundation of the inference engine.
 
----
 
 ### Next lesson
 

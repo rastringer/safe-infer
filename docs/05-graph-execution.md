@@ -2,7 +2,6 @@
 
 ## From Graph to Execution
 
----
 
 ### Goals
 
@@ -15,7 +14,6 @@ In this lesson, we cover:
 
 This lesson corresponds to PR [#4](https://github.com/rastringer/safe-infer/commit/2cf609ce13808670a6911bf56b52628b653acf91): **Add minimal executor and first runnable inference**.
 
----
 
 ### From Structure to Action
 
@@ -27,7 +25,6 @@ Having built a computation graph and a planner that produces a valid execution o
 
 We now need to specify how the system should perform computations.
 
----
 
 ### Separation of Concerns: Planning vs Execution
 
@@ -38,7 +35,6 @@ A deliberate design choice in this project is to separate:
 
 This is because planning is about correctness and safety, while execution is about state mutation and computation. Keeping these concerns separate makes both stages easier to reason about and test.
 
----
 
 ### Runtime State: The Tensor Store
 
@@ -52,7 +48,6 @@ Each entry corresponds to a `TensorId` in the graph.
 
 At execution time, the tensors are already allocated. Input tensors are pre-filled by the caller and output tensors are written by operations. The executor does not allocate or resize tensors.
 
----
 
 ### The Executor Interface
 
@@ -66,7 +61,6 @@ void execute(const Graph& g,
 
 This function assumes the graph has already been validated, executes nodes in the given order and mutates the tensor store in place. Any violation of its assumptions results in an explicit error.
 
----
 
 ### Supported Operations (Initial Set)
 
@@ -76,7 +70,6 @@ For this lesson, the executor supports only a small set of operations to keep th
 * `Relu` — elementwise `max(0, x)`
 * `Add` — elementwise addition
 
----
 
 ## Executing a Node
 
@@ -93,7 +86,6 @@ Each operation enforces its own local invariants, such as:
 * matching element counts
 
 
----
 
 ### Minimal Kernels
 
@@ -112,7 +104,6 @@ And Add:
 out[i] = a[i] + b[i];
 ```
 
----
 
 ### A First End-to-End Example
 
@@ -136,7 +127,6 @@ The output is:
 
 This shows that the graph is planned correctly and tensor data flows as intended.
 
----
 
 ### Executor Assumptions
 
@@ -149,7 +139,6 @@ The current executor makes strong assumptions:
 
 Such assumptions are *intentional*. They allow us to see where safety checks belong and what happens when they are missing.
 
----
 
 ### Why This Matters for Safety
 
@@ -167,13 +156,11 @@ In real systems, these failures can lead to:
 
 Understanding where assumptions live is the first step to hardening them.
 
----
 
 ### Current Status
 
 At this stage, the our minimal pipeline represents a model as a graph and validates its structure. The engine then plans execution order, conducts operation and provides outputs.
 
----
 
 ### Next Lesson 
 
@@ -187,6 +174,5 @@ The next lesson will intentionally break assumptions:
 
 This is where safety and security concerns become explicit.
 
----
 
 **Next lesson:** Lesson 6 — Breaking the Executor: Failure Modes and Attacks

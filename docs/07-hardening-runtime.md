@@ -2,7 +2,6 @@
 
 ## Hardening the Runtime: Contracts and Validation
 
----
 
 ### Goals
 
@@ -15,7 +14,6 @@ This lesson explores:
 
 This lesson corresponds to PR [#5](https://github.com/rastringer/safe-infer/commit/4aa729a9af4f34bc65f556b1952a6dd7378b638f), "Planner-side hardening: enforce graph contracts".
 
----
 
 ## The Problem: Assumptions Are an Attack Surface
 
@@ -26,7 +24,6 @@ In Lesson 6 we saw two categories of failures:
 
 At a high level, the silent failures happen when a system takes on a contract without enforcing it. 'Hardening' here means we make the contract explicit and enforce it early. 
 
----
 
 ### Contract 1: Every Tensor Must Have a Source
 
@@ -35,13 +32,11 @@ A node input tensor must be either produced by a node in the graph, or provided 
 **Hardening rule:**
 > A graph must not reference tensors that have no defined source.
 
----
 
 ### Contract 2: Op Arity Must Be Valid
 
 In Lesson 5, we assumed `Relu` has exactly 1 input and 1 output, and `Add` has exactly 2 inputs and 1 output. Hardening for these functions means we validate arity at graph-validation time, and, if failure is necessary, we fail before reaching execution. This prevents out-of-range indexing into `node.inputs`, and accidental interpretation of malformed nodes.
 
----
 
 ### Contract 3: Inputs Must Be Explicitly Bound
 
@@ -54,7 +49,6 @@ Hardening rule:
 > If a required input is not bound, execution must fail fast.
 
 
----
 
 ### Where to Validate: Planner vs Executor
 
@@ -64,7 +58,6 @@ By validating **runtime** state in the executor, our required inputs are bound; 
 
 This separation keeps each layer small and trustworthy.
 
----
 
 ## Revisiting Lesson 6
 
@@ -78,7 +71,6 @@ In the last lesson, the graph executed anyway, and NaNs were masked into zeroes.
 
 After PR [#6](https://github.com/rastringer/safe-infer/commit/a467f43634655b81f66152b0f1261ed72fd09d2e), this becomes a fail-fast error.
 
----
 
 ## Current Status 
 
@@ -87,7 +79,6 @@ We added clear contracts and enforced them at suitable stages in the engine's op
 - detect missing inputs deterministically
 - make failures loud rather than silent
 
----
 
 ## Next Lesson
 
@@ -96,6 +87,5 @@ As with many security considerations in software, the tradeoff is that more chec
 In the next lesson, we’ll discuss how production systems balance
 performance vs safety, and how we can aim for both optimized checking and speed.
 
----
 
 **Next lesson:** Lesson 8 — Performance vs Safety Tradeoffs

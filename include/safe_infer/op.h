@@ -23,6 +23,8 @@ struct Node {
     OpCode op{};
     std::vector<TensorId> inputs;
     std::vector<TensorId> outputs;
+    // For OpCode::Const: flat values in row-major order. Empty for other ops.
+    std::vector<float> const_data{};
 }; 
 
 } // namespace safe_infer

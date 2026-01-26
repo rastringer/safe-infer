@@ -1,0 +1,112 @@
+# Lesson 9
+
+### Goals
+
+Run a small model through our inference engine!
+
+In this lesson, you will add to the code base to add:
+
+- `Const` tensors for learned parameters
+- a minimal `MatMul` op for matrix multiplication
+- build a tiny neural network as a computation graph
+- execute it using the planner and executor pipeline
+- observe real outputs
+
+Please bear in mind this is a simple engine to illustrate safe capabilities to run a simple model and we leave out the various performance optimizations and other capabilities we would see in a more fully-developed inference engine.
+
+### XOR
+
+We will implement a model that computes **XOR**.
+
+XOR (“exclusive or”) behaves like this:
+
+| x1 | x2 | XOR |
+|----|----|-----|
+| 0  | 0  |  0  |
+| 0  | 1  |  1  |
+| 1  | 0  |  1  |
+| 1  | 1  |  0  |
+
+Intuitively, output is 1 if the inputs are *different*, and output is 0 if they are the *same*
+
+We use XOR because it's the smallest example that actually behaves like a neural network: it can't be computed with a single linear layer, forcnig us to use matrix multiplication, nonlinearity (via ReLU) and multiple layers. 
+
+
+### The XOR model via ReLU
+
+We'll compute XOR for inputs in {0, 1}  using a tiny network. 
+
+We construct two hidden features: 
+- h1 = relu(x1-x2)
+- h2 = relu(x2 - x1)
+
+We can consider these values as asking by how much is x1 bigger than x2, and x2 by x1?
+
+Then we add them:
+
+-y = h1 + h2
+
+for binary inputs, this equals XOR.
+
+### Graph structure
+
+X -> MatMul(W1) -> Relu -> MatMul(W2) ->
+
+Where `x` is a graph input tensor of shape [1,2], W1 and W2, the model's *weights*, are Const tensors.
+
+`Const` matters since weights are part of the model, rather than runtime inputs. We make them const to safely avoid any adjustment - accidental or otherwise - to their values.
+
+`Const` turns the model parameters into explicity graph nodes and tensor slots.
+
+### MatMul
+
+Matrix multiplication is the core building block of dense neural net layers. We implement only rank-2 matrices and perform shape-checked multiplication. We leave out more sophisticated operations such as broadcasting, batching, transposes or optimizations.
+
+## Exercise
+
+Try to implement the following:
+
+### 1: Add `Const`
+
+Implement an operator that:
+
+- takes 0 inputs
+- produces 1 output
+- copies stored values into its output tensor
+
+There are three files which will need additions: `op.h`, `executor.cpp` and `planner.cpp`.
+
+### 2: Add `MatMul`
+
+Implement matrix multiplication for rank-2 tensors:
+
+[N, D] x [D, M] -> [N, M]
+
+- validate ranks, inner dimensions, output shape, and fail fast on mismatch.
+
+Look at the same three files as in task **1**.
+
+### 3: Build the XOR Graph
+
+Create a graph with:
+
+- input tensor `x`
+- constant tensors `W1`, `W2`
+- MatMul -> Relu -> MatMul pipeline
+- proper graph_inputs / graph_outputs
+
+### 4: Run!
+
+Run inference for:
+
+(0, 1), (0, 1), (1, 0), (1, 1)
+
+Output should look like this:
+
+x=(0,0)  =>  y=0
+x=(0,1)  =>  y=1
+x=(1,0)  =>  y=1
+x=(1,1)  =>  y=0
+
+Please see this PR for the solution.
+

@@ -2,7 +2,6 @@
 
 ## Operations, Graphs, and Execution Order
 
----
 
 ### Goals
 
@@ -15,7 +14,6 @@ This lesson covers:
 
 This lesson corresponds to PR [#3](https://github.com/rastringer/safe-infer/commit/af2a5ed8caa5a8ed6172f16c9e25b90bba2530b6): **Graph IR and execution planner**.
 
----
 
 ### From Tensors to Programs
 
@@ -26,7 +24,6 @@ In the previous lessons, we focused on *individual building blocks*:
 
 Once we have multiple tensors and multiple operations, we need to consider the order in which operations should run. The answer is determined by data dependencies.
 
----
 
 ### Inference as a Directed Acyclic Graph (DAG)
 
@@ -41,7 +38,6 @@ The direction of an edge encodes a requirement:
 
 If these requirements form a cycle, the program is invalid.
 
----
 
 ## The Graph Intermediate Representation
 
@@ -64,7 +60,6 @@ struct Graph {
 
 This representation is intentionally minimal, contains no tensor data and encodes only *structure* and *dependencies*.
 
----
 
 ## Tensor IDs as Symbols
 
@@ -72,7 +67,6 @@ This representation is intentionally minimal, contains no tensor data and encode
 
 This means that every tensor referenced by the graph must exist, and invalid tensor IDs represent undefined variables. Before any execution logic runs, the graph must be validated.
 
----
 
 ### Validation as a Safety Boundary
 
@@ -90,7 +84,6 @@ Rejecting invalid graphs early prevents:
 
 Execution code assumes the graph is valid.
 
----
 
 ### Producer–Consumer Relationships
 
@@ -103,7 +96,6 @@ This allows us to derive edges:
 * if node B consumes a tensor produced by node A
 * then A must run before B
 
----
 
 ## Building the Dependency Graph
 
@@ -114,7 +106,6 @@ Once producers are known, dependencies are represented as:
 
 These structures make execution order explicit.
 
----
 
 ### Topological Sorting
 
@@ -126,7 +117,6 @@ To compute a valid execution order, we perform a [topological sort](https://en.w
 
 If all nodes can be scheduled, the graph is valid. Otherwise, the graph contains a cycle.
 
----
 
 ### Cycle Detection
 
@@ -137,7 +127,6 @@ Cycles represent impossible execution requirements:
 
 The planner detects cycles by checking whether all nodes were scheduled. If not, it throws an error and rejects the graph. This prevents infinite loops and undefined behavior at runtime.
 
----
 
 ### Diagram
 
@@ -179,13 +168,11 @@ The planner is validated with tests that cover:
 * cyclic graphs
 * invalid tensor references
 
----
 
 ### Current Status
 
 At this stage, the system can represent models as explicit programs, validate structural correctness, and compute a deterministic execution order.
 
----
 
 ### Next Lesson
 

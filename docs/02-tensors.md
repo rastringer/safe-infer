@@ -53,7 +53,7 @@ The interface lacks setters or mutable access to dimensions, since after contruc
 
 ### Contstructor Validation
 
-Here is the constructor that enforces our invariants:
+Here's the constructor that enforces our invariants:
 
 ```
 // tensor_shape.cpp
@@ -85,7 +85,7 @@ for (auto d : dims_) {
 }
 ```
 
-This code is problematic because if the multiplication overflows `size_t`, the behaviour is undefined, and the result wraps around. The wrapped value could then be used to allocate too little memory, index out of bounds, or even to corrupt unrelated memory.
+This snippet is problematic because if the multiplication overflows `size_t`, the behaviour is undefined, and the result wraps around. The wrapped value could then be used to allocate too little memory, index out of bounds, or even to corrupt unrelated memory.
 
 ### Overflow-Safe Multiplication
 
@@ -116,13 +116,13 @@ We expose dimensions via:
 
 This communicates three guarantees:
 
-* the caller cannot modify the dimensions
+* the caller can't modify the dimensions
 * calling the function doesn't modify the object
-* the function cannot throw
+* the function can't throw
 
 ### Tests
 
-We add a test file to verify the program:
+In `/tests`, we add a file to check the program:
 
 * rejects empty shapes and zero dimensions 
 * detects overflow

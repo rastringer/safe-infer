@@ -50,3 +50,14 @@ target_link_libraries(example_missing_input PRIVATE safe_infer)
 add_executable(test_executor tests/test_executor.cpp)
 target_link_libraries(test_executor PRIVATE safe_infer)
 add_test(NAME test_executor COMMAND test_executor)
+
+add_executable(test_const tests/test_const.cpp)
+target_link_libraries(test_const PRIVATE safe_infer)
+add_test(NAME test_const COMMAND test_const)
+
+add_executable(test_matmul tests/test_matmul.cpp)
+target_link_libraries(test_matmul PRIVATE safe_infer)
+add_test(NAME test_matmul COMMAND test_matmul)
+
+add_executable(example_xor_relu examples/capstone/xor_relu.cpp)
+target_link_libraries(example_xor_relu PRIVATE safe_infer)

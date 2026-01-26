@@ -58,6 +58,66 @@ void exec_add(const Node& node, std::vector<Tensor>& tensors) {
     }
 }
 
+void exec_const(const Node& node, std::vector<Tensor>& tensors) {
+    require(node.inputs.size() == 0, "Const: expected 0 inputs");
+    require(node.outputs.size() == 1, "Const: expected 1 output");
+
+    const TensorId out_id = node.outputs[0];
+    Tensor& out = tensors[out_id];
+
+    require(node.const_data.size() == out.num_elements(),
+            "Const: const_data size must match output tensor element count");
+
+    for (std::size_t i = 0; i < out.num_elements(); ++i) {
+        out[i] = node.const_data[i];
+    }
+}
+
+static void require_rank2(const TensorShape& s, const char* msg) {
+    require(s.rank() == 2, msg);
+}
+
+void exec_matmul(const Node& node, std::vector<Tensor>& tensors) {
+    require(node.inputs.size() == 2, "MatMul: expected 2 inputs");
+    require(node.outputs.size() == 1, "MatMul: expected 1 output");
+
+    const Tensor& A = tensors[node.inputs[0]];
+    const Tensor& B = tensors[node.inputs[1]];
+    Tensor& Out = tensors[node.outputs[0]];
+
+    const TensorShape& aS = A.shape();
+    const TensorShape& bS = B.shape();
+    const TensorShape& oS = Out.shape();
+
+    require_rank2(aS, "MatMul: A must be rank-2");
+    require_rank2(bS, "MatMul: B must be rank-2");
+    require_rank2(oS, "MatMul: Out must be rank-2");
+
+    const auto& ad = aS.dims(); // [N, D]
+    const auto& bd = bS.dims(); // [D, M]
+    const auto& od = oS.dims(); // [N, M]
+
+    const std::size_t N = ad[0];
+    const std::size_t D = ad[1];
+    require(bd[0] == D, "MatMul: inner dimension mismatch (A.cols must equal B.rows)");
+    const std::size_t M = bd[1];
+
+    require(od[0] == N && od[1] == M, "MatMul: output shape must be [A.rows, B.cols]");
+
+    // Out[i,j] = sum_k A[i,k] * B[k,j]
+    for (std::size_t i = 0; i < N; ++i) {
+        for (std::size_t j = 0; j < M; ++j) {
+            float acc = 0.0f;
+            for (std::size_t k = 0; k < D; ++k) {
+                const float a = A[i * D + k];
+                const float b = B[k * M + j];
+                acc += a * b;
+            }
+            Out[i * M + j] = acc;
+        }
+    }
+}
+
 } // namespace
 
 InputBindings::InputBindings(std::size_t num_tensors) : bound_(num_tensors, false) {}
@@ -98,7 +158,7 @@ void execute(const Graph& g,
 
         switch (node.op) {
             case OpCode::Input:
-                // No-op for now: the input tensor is expected to be pre-filled by the caller.
+                exec_const(node, tensors);
                 break;
 
             case OpCode::Relu:
@@ -107,6 +167,14 @@ void execute(const Graph& g,
 
             case OpCode::Add:
                 exec_add(node, tensors);
+                break;
+
+            case OpCode::MatMul:
+                exec_matmul(node, tensors);
+                break;
+
+            case OpCode::Const:
+                exec_const(node, tensors);
                 break;
 
             default:
