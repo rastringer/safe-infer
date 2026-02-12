@@ -99,7 +99,7 @@ We have discussed potential attacks and failures to identify assumptions, observ
 
 ## Next Lesson
 
-We will start **hardening the runtime**.
+We start hardening the runtime.
 
 
 **Next lesson:** Lesson 7 — Hardening the Runtime: Contracts and Validation

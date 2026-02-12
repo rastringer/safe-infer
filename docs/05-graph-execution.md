@@ -17,13 +17,7 @@ This lesson corresponds to PR [#4](https://github.com/rastringer/safe-infer/comm
 
 ### From Structure to Action
 
-Having built a computation graph and a planner that produces a valid execution order, the system knows:
-
-* *what* operations exist
-* *how* they depend on one another
-* *in what order* they must run
-
-We now need to specify how the system should perform computations.
+Having built a computation graph and a planner that produces a valid execution order, the system knows what operations exist, how they depend on one another and in what order they must run. We now need to specify how the system should perform computations.
 
 
 ### Separation of Concerns: Planning vs Execution
@@ -80,19 +74,12 @@ Execution proceeds node by node:
 3. Read input tensors
 4. Write output tensors
 
-Each operation enforces its own local invariants, such as:
-
-* number of inputs and outputs
-* matching element counts
-
+Each operation enforces its own local invariants, such as the number of inputs and outputs, or matching element counts.
 
 
 ### Minimal Kernels
 
-Here is our simple ReLU. As a reminder, here is how a *rectified linear unit* functions:
-
-* if the input is positive, the output is the same value
-* if the input is zero or negative, the output is zero
+Here's our simple ReLU. As a reminder, a *rectified linear unit* returns the input if positive, and zero if the input is zero or negative.
 
 ```cpp
 out[i] = (in[i] > 0.0f) ? in[i] : 0.0f;
@@ -142,19 +129,7 @@ Such assumptions are *intentional*. They allow us to see where safety checks bel
 
 ### Why This Matters for Safety
 
-Even this tiny executor reveals key safety questions:
-
-* What happens if shapes do not match?
-* What if an op is unsupported?
-* What if inputs are missing or uninitialized?
-
-In real systems, these failures can lead to:
-
-* silent mis-computation
-* memory corruption
-* undefined behavior
-
-Understanding where assumptions live is the first step to hardening them.
+Even this tiny executor reveals key safety questions. For example, what happens if shapes do not match, or if a caller ask for an op is unsupported? What if inputs are missing or uninitialized? In real systems, these failures can lead to mis-computation that may not be immediately obvious; memory corruption or undefined behaviour.
 
 
 ### Current Status

@@ -84,21 +84,9 @@ This prevents accidental, implicit duplication of large buffers.
 
 ### The `Tensor` Interface
 
-The public interface of `Tensor` is intentionally minimal:
+The public interface of `Tensor` is intentionally minimal. We construct a tensor from a valid `TensorShape` and are able to access its shape and element count. The interface also allows raw data access for computation and indexed element access. 
 
-* construction from a valid `TensorShape`
-* access to shape and element count
-* raw data access for computation
-* indexed element access
-
-Notably absent are:
-
-* default constructors
-* copy constructors
-* shared ownership
-
-This keeps ownership explicit and easy to reason about.
-
+To keep ownership explicit, we exclude default and copy constructors, as well as shared ownership.
 
 ### Construction and Allocation
 
@@ -127,18 +115,11 @@ The tensor does not explicitly free memory, instead relying on RAII:
 * `std::vector<float>` frees its buffer in its destructor
 * `Tensor` does not need a custom destructor
 
-This guarantees:
-
-* no memory leaks
-* no double frees
-* correct cleanup even in the presence of exceptions
-
-RAII makes correct behavior the default.
-
+This approach is our guarantee against memory leaks, double frees and ensures correct clean up -- even when we have exceptions. RAII makes correct behaviour the default.
 
 ### Why the Tensor Is Move-Only
 
-Copying a tensor would mean copying its entire buffer. Copying significant amounts of data would be expensive, often accidental and may not be what a developer intended. 
+Copying a tensor would mean copying its entire buffer, a significant task which can get expensive, is often accidental and may not be what a developer intended. 
 
 To prevent this, we delete copy operations:
 
@@ -167,10 +148,7 @@ Tensor t2 = std::move(t1);
 
 `t2` owns the data.
 
-`t1` is left in a valid but unspecified state:
-
-* it can be destroyed safely
-* it should not be used for computation
+`t1` is left in a valid but unspecified state. The tensor can be destroyed safely and shouldn't be used for anything further.
 
 
 ### Accessors and Contracts
@@ -217,10 +195,6 @@ This is the core memory safety foundation of the inference engine.
 
 ### Next lesson
 
-With tensors in place, we can begin defining **operations and computation graphs**:
-
-* nodes and edges
-* dependency tracking
-* execution order
+With tensors in place, we can begin defining **operations and computation graphs**, including nodes, edges, dependency tracking and execution order.
 
 This will introduce graph traversal and scheduling — and new classes of safety concerns.

@@ -76,13 +76,7 @@ The planner enforces several key invariants:
 * each tensor has at most one producer
 * nodes cannot depend on their own outputs
 
-Rejecting invalid graphs early prevents:
-
-* out-of-bounds memory access
-* ambiguous writes
-* unpredictable execution order
-
-Execution code assumes the graph is valid.
+Rejecting invalid graphs early prevents out-of-bounds memory access, ambiguous writes and unpredictable execution order. Execution code assumes the graph is valid.
 
 
 ### Producer–Consumer Relationships
@@ -99,12 +93,7 @@ This allows us to derive edges:
 
 ## Building the Dependency Graph
 
-Once producers are known, dependencies are represented as:
-
-* an adjacency list (edges between nodes)
-* an indegree count (how many unmet dependencies each node has)
-
-These structures make execution order explicit.
+Once producers are known, dependencies are represented as an adjacency list (edges between nodes) and an indegree count (how many unmet dependencies each node has). These structures make execution order explicit.
 
 
 ### Topological Sorting

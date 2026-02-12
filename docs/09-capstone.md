@@ -56,9 +56,7 @@ Where `x` is a graph input tensor of shape [1,2], W1 and W2, the model's *weight
 
 ### `Const`
 
-`Const` matters since weights are part of the model, rather than runtime inputs. We make them const to ensure they are written once and then only read from that point. This mitigates either accidental or intentional misue - the weights cannot be treated as caller-provided inputs by the executor.
-
-`Const` turns the model parameters into explicity graph nodes and tensor slots.
+`Const` matters since weights are part of the model, rather than runtime inputs. We make them const to ensure they are written once and then only read from that point. This mitigates either accidental or intentional misue - the weights cannot be treated as caller-provided inputs by the executor. `Const` turns the model parameters into explicity graph nodes and tensor slots.
 
 ### MatMul
 

@@ -55,30 +55,28 @@ The interface lacks setters or mutable access to dimensions, since after contruc
 
 Here's the constructor that enforces our invariants:
 
-```
+```cpp
 // tensor_shape.cpp
 TensorShape::TensorShape(std::vector<std::size_t> dims) {
-if (dims.empty()) {
-throw std::domain_error("TensorShape: dims cannot be empty");
-}
+    if (dims.empty()) {
+        throw std::domain_error("TensorShape: dims cannot be empty");
+    }
 
 
-for (std::size_t d : dims) {
-if (d == 0) {
-throw std::domain_error("TensorShape: dims must be > 0");
-}
-}
-
-
-dims_ = std::move(dims);
-}
+    for (std::size_t d : dims) {
+        if (d == 0) {
+            throw std::domain_error("TensorShape: dims must be > 0");
+        }
+    }
+    dims_ = std::move(dims);
+    }
 ```
 
 ### Safe Size Computation
 
 A naive implementation of `num_elements()` might look like this:
 
-```
+```cpp
 std::size_t n = 1;
 for (auto d : dims_) {
     n *= d;
@@ -91,7 +89,7 @@ This snippet is problematic because if the multiplication overflows `size_t`, th
 
 Instead, we check explicitly for overflow:
 
-```
+```cpp
 std::size_t TensorShape::num_elements() const {
     const std::size_t max_size = std::numeric_limits<std::size_t>::max();
     std::size_t product = 1;
