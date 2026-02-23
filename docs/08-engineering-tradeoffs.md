@@ -28,16 +28,9 @@ Planner validation happens once per graph, and before any execution. Examples fr
 * every tensor must have a source (PR #5)
 * cycle detection
 
-### Pros
+### Pros and Cons
 
-* cheap relative to execution
-* catches entire classes of bugs early
-* simplifies downstream code
-
-### Cons
-
-* cannot catch data-dependent errors
-* assumes the graph will not change after planning
+Planner validation is cheap relative to execution, and can catch entire classes of bugs early, avoiding expensive downtime and debugging efforts. On the con side, it will not catch errors brought by input data, and it assumes the graph will not change after planning.
 
 The design decision:
 
@@ -54,16 +47,9 @@ Examples from this course include:
 * tensor shape consistency
 * plan index validation
 
-### Pros
+### Pros and Cons
 
-* prevents silent mis-computation
-* protects against misuse of the API
-* enforces contracts between stages
-
-### Cons
-
-* adds overhead to every run
-* must be carefully scoped
+The validation prevents silent mis-computation, protects against misuse of the API and enforces contracts between stages. However, it adds overhead to each run and has to be carefully scoped to prevent increases to that overhead.
 
 Design decision:
 
@@ -79,15 +65,9 @@ Examples:
 * element count matching in `Add`
 * bounds assumptions
 
-### Pros
+### Pros and Cons
 
-* catches the last line of defense errors
-* protects against undefined behavior
-
-### Cons
-
-* most expensive place to check
-* can meaningfully impact performance
+The kernel checks catch the last line of defense errors and protects against undefined behavior. Kernel operations are also a computationally expensive place to perform checks, and impacts upon performance can be significant.
 
 Design decision:
 
